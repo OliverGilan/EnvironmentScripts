@@ -4,7 +4,7 @@
         + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 }
 
-function Push-User-Path($userPath) {
+function Push-UserPath($userPath) {
     $path = [Environment]::GetEnvironmentVariable('Path', 'User')
     $newpath = "$userPath;$path"
     [Environment]::SetEnvironmentVariable("Path", $newpath, 'User')

@@ -1,6 +1,11 @@
 ﻿. $PSScriptRoot\windows\SetupWSL.ps1
 . $PSScriptRoot\windows\Chocolatey.ps1
+. $PSScriptRoot\windows\SetupWindowsEnv.ps1
+. $PSScriptRoot\windows\RefreshEnvPath.ps1
 
+#
+# WSL Setup
+#
 
 Write-Host "Checking if WSL is installed..."
 $rebootRequired = $false
@@ -24,49 +29,45 @@ if($rebootRequired){
     }
 }
 
-Choco-Version
 
 #
-# Functions
+# Windows Setup
 #
 
-function RefreshEnvPath
-{
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") `
-        + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-}
+Write-Host "Updating Windows Explorer settings"
+Set-WindowsSettings
+RefreshEnvPath
 
-function Push-User-Path($userPath) {
-    $path = [Environment]::GetEnvironmentVariable('Path', 'User')
-    $newpath = "$userPath;$path"
-    [Environment]::SetEnvironmentVariable("Path", $newpath, 'User')
-    Update-Environment-Path
-}
-
-function Install-Chocolatey {
-    Set-ExecutionPolicy Bypass -Scope Process -Force;
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
-    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
-
-function Install-FromChocolatey {
-    param(
-        [string]
-        [Parameter(Mandatory = $true)]
-        $PackageName
-    )
-
-    choco install $PackageName --yes
-}
-
-
-#
-# Setup
-#
-
-# choco
+Write-Host "Installing Chocolatey"
 Install-Chocolatey
 RefreshEnvPath
 
+Write-Host "Choco version"
+Choco-Version
+
+
+#
+# Tools Setup
+#
+
 # git
 Install-FromChocolatey 'git'
+
+# dotnet
+Install-FromChocolatey 'dotnetcore-sdk'
+Install-FromChocolatey 'dotnet-sdk'
+
+Install-FromChocolatey 'vscode-insiders'
+Install-FromChocolatey 'visualstudio2022enterprise'
+
+Install-FromChocolatey 'docker-cli'
+Install-FromChocolatey 'microsoft-windows-terminal'
+Install-FromChocolatey 'fiddler'
+Install-FromChocolatey 'postman'
+Install-FromChocolatey 'linqpad'
+Install-FromChocolatey 'drawio'
+Install-FromChocolatey 'firefox'
+Install-FromChocolatey 'googlechrome'
+Install-FromChocolatey 'powershell-core'
+
+RefreshEnvPath

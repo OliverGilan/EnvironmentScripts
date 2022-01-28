@@ -10,7 +10,7 @@ function Install-FromChocolatey {
         [Parameter(Mandatory = $true)]
         $PackageName
     )
-
+    Write-Host "Installing ${packageName}"
     choco install $PackageName --yes
 }
 
